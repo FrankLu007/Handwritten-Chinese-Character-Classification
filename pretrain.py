@@ -65,12 +65,12 @@ if __name__ == '__main__':
     if args.ld:
     	model = torch.load(args.ld)
     else:
-    	model = EffNet().half().cuda()
-    	model = ResNet().cuda()
+    	# model = EffNet().half().cuda()
+    	model = ResNet().half().cuda()
     torch.backends.cudnn.benchmark = True
     LossFunction = torch.nn.CrossEntropyLoss()
-    # optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum = 0.9)
-    optimizer = torch.optim.Adam(model.parameters(), lr = args.lr)
+    optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum = 0.9)
+    # optimizer = torch.optim.Adam(model.parameters(), lr = args.lr)
     BestLoss = 99999
 
     for iteration in range(args.it):
@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
     	# create data
     	labels = torch.randint(low = 0, high = 801, size = (args.bs, ), device = 'cuda')
-    	inputs = torch.stack([CreataData(label.item()) for label in labels]).cuda()
+    	inputs = torch.stack([CreataData(label.item()) for label in labels]).half().cuda()
 
     	# forward and backward
     	outputs = model(inputs)
