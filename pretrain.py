@@ -27,7 +27,7 @@ def CreataData(label : int) -> torch.Tensor :
 
 	# font
 	size = torch.randint(low = 30, high = 70, size = (1, )).item()
-	FontType = ImageFont.truetype('C:\\WINDOWS\\FONTS\\' + font[torch.randint(low = 0, high = len(font), size = (1, )).item()], size)
+	FontType = ImageFont.truetype('fonts/' + font[torch.randint(low = 0, high = len(font), size = (1, )).item()], size)
 	PIL_Image = Image.fromarray(image)
 	draw = ImageDraw.Draw(PIL_Image)
 	pos = (torch.randint(low = 50, high = 100, size = (1, )).item(), torch.randint(low = 34, high = 80 - size // 2, size = (1, )).item())
@@ -65,12 +65,12 @@ if __name__ == '__main__':
     if args.ld:
     	model = torch.load(args.ld)
     else:
-    	# model = EffNet().half().cuda()
-    	model = ResNet().half().cuda()
+    	model = EffNet().half().cuda(1)
+    	# model = ResNet().half().cuda(1)
     torch.backends.cudnn.benchmark = True
     LossFunction = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum = 0.9)
-    # optimizer = torch.optim.Adam(model.parameters(), lr = args.lr)
+    # optimizer = torch.optim.Adam(model.parameters(), lr = args.lr, eps = 1e-4)
     BestLoss = 99999
 
     for iteration in range(args.it):
@@ -78,10 +78,11 @@ if __name__ == '__main__':
     	# initialize
     	torch.cuda.empty_cache()
     	optimizer.zero_grad()
+        
 
     	# create data
-    	labels = torch.randint(low = 0, high = 801, size = (args.bs, ), device = 'cuda')
-    	inputs = torch.stack([CreataData(label.item()) for label in labels]).half().cuda()
+    	labels = torch.randint(low = 0, high = 801, size = (args.bs, ), device = 'cuda:1')
+    	inputs = torch.stack([CreataData(label.item()) for label in labels]).half().cuda(1)
 
     	# forward and backward
     	outputs = model(inputs)
