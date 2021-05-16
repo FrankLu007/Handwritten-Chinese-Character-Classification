@@ -46,15 +46,15 @@ def forward(DataLoader, model, LossFunction, optimizer = None):
 		if optimizer:
 			optimizer.zero_grad()
 
-		inputs = inputs.half().cuda(1)
-		labels = labels.cuda(1)
+		inputs = inputs.half()
+		labels = labels
 		loss, outputs = model(inputs, labels)
 		# outputs = model(inputs)
 		del inputs
 		# loss = LossFunction(outputs, labels)
-		TotalLoss += loss.item()
+		TotalLoss += loss.mean().item()
 		if optimizer:
-			loss.backward()
+			loss.mean().backward()
 			optimizer.step()
 		value, pred = outputs.max(1)
 		cases += labels.shape[0]
@@ -126,7 +126,8 @@ if __name__ == '__main__':
     	model = torch.load(args.ld)
     else:
     	# model = EffNet().half().cuda(1)
-    	model = ViT().half().cuda(1)
+    	model = ViT().half().cuda()
+    	model = torch.nn.DataParallel(model)
     torch.backends.cudnn.benchmark = True
     optimizer = torch.optim.Adam(model.parameters(), lr = args.lr, eps = 1e-4)
     LossFunction = torch.nn.CrossEntropyLoss()
