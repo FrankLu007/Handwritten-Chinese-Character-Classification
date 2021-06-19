@@ -61,6 +61,6 @@
 2. 善用三次 retry 的時間去增加模型準確率
 
 ## 7. 啟動
-'''
+```
 python api.py --p [port] --n [num_thread]
-'''
+```
