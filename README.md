@@ -39,7 +39,7 @@
 1. Api server 啟動時就預先載入 model
 2. 前處理要用 GPU 做，可以的話就用半精度
 3. 模型 inference 要用半精度而且要記得啟用 no_grad 跟 eval
-4. *torch.backends.cudnn.benchmark = True* 有一定程度的幫助
+4. *torch.backends.cudnn.benchmark = True* 有一定程度的幫助，且要先經過一兩次 forward 後面才會加速
 
 **維運優化**
 1. 儲存圖片: 方便比賽結束後拿來訓練，以預測結果當檔名可以節省清理資料的時間
@@ -50,8 +50,8 @@
     * 單一模型 (n = 1) 最大可以到 batch size = 64 ，每秒 3 個 request 內可以承受，考慮到依然有更多 request 的風險，且此技術需要足夠大的 batch size 才有意義，最後忍痛移除
     * 後來系統設計改成多個模型後能使用的 GPU 空間更少，更難以負荷
 2. Retry 機會:
-    * 若配合 test-time augmentation 可以達到更好的效果。
-    * 測試賽時每個 retry 都是 2 不知道是不是主辦單位故意防這招
+    * 若配合 test-time augmentation 可以達到更好的效果
+    * 測試賽時每個 retry 都是 2 所以沒辦法測試此功能
     * 動態增減全域儲存測資的資料結構，感覺會很耗時間但沒有太多機會測試
 3. Miltiprocess:
     * 加了 spawn 還是沒法用，這個 bug 尚未解決
