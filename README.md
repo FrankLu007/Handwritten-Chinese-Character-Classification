@@ -24,15 +24,15 @@
 3. Fork 出儲存圖片的程序，並啟動 flask (multithread)
 4. 等待接收 request 
 5. 先將將圖片解碼後轉換成 tensor 格式再送入 GPU 做前處理
-6. 從模型使用的 queue 中取得該使用的模型 id，進行完 inference 後再將 id 放回 queue 中，再將預測值與圖片的 base64 字串丟入圖片儲存的 queue，該子程序會將圖片解碼後依照 uuid 和預測結果命名後儲存
+6. 從模型使用的 model pool 中取得該使用的模型 id，進行完 inference 後再將 id 放回 model pool 中，再將預測值與圖片的 base64 字串丟入圖片儲存的 pipe，該子程序會將圖片解碼後依照 uuid 和預測結果命名後儲存
 ![diagram](diagram.jpg)
 7. 計算其他時間等資訊，並連同預測結果回傳
 8. 回到步驟 4
 
 **物件介紹** 
 1. flask: python裡可以快速部屬 server 並提供 api 的套件
-2. image_storage: python queue, 由主程序提供圖片相關資訊給子程序
-3. model_usage: python queue, 用來作為 lock 使用，同時也是種 model pool，決定當前的 thread 可以使用哪個模型
+2. image_storage: 以 python queue 實作 pipe 功能, 由主程序提供圖片相關資訊給子程序
+3. model_usage: 以 python queue 實作 model pool 功能，決定當前的 thread 可以使用哪個模型；同時也具備 lock 性質，可管理並確保一個模型不會有兩個 thread 使用
 
 ## 4. 優化技巧
 **速度優化**
